@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="dirent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Cloud_Dtec.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BgDefaults.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BgEdge.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BgEdgeDetect.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BgEdgeList.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BgImage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MeanShift.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="msImageProcessor.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="msSystem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RAList.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RegionList.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="tdef.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Cloud_Dtec.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="BgEdge.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="BgEdgeDetect.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="BgEdgeList.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="BgGlobalFc.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="BgImage.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MeanShift.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="msImageProcessor.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="msSystem.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="RAList.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="RegionList.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

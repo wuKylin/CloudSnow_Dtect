@@ -34,35 +34,6 @@ using namespace::std;
 Mat src, dst;
 int height, width;
 
-//定义的图像变量
-BgImage* cbgImage_;
-BgImage* filtImage_;
-BgImage* segmImage_;
-BgImage* whiteImage_;
-
-
-
-//定义相关变量
-msImageProcessor *iProc;
-RegionList *regionList; // 存储边界信息
-int *regionLables; // 存储多边形标识,即每个像素对应哪个多边形
-int *regionPC; // 存储多边形中所包含的像素的个数 
-float *regionData; // 存储每个多边形的特性
-int regionCount; // 多边形的个数
-
-BOOL *isCS;//分割区域是否为云雪区域
-
-
-//segmemtation parameters
-int		sigmaS, minRegion, kernelSize;
-float	sigmaR, aij, epsilon, *gradMap_, *confMap_, *weightMap_, *customMap_;
-bool		edgeParamsHaveChanged_, hasBoundaries_, buseWeightMap_;
-SpeedUpLevel	speedUpLevel_;
-float speedUpThreshold_;
-int hasImage_, hasFilter_, hasSegment_;
-
-int operation;//判断操作方式
-
 CvSVMParams ctparams, clparams, csparams, tlparams, tsparams, lsparams;
 CvSVM ctSVM,clSVM,csSVM,tlSVM,tsSVM,lsSVM;
 
@@ -90,9 +61,58 @@ public:
 	};
 	void SetPoints(int*, int*, int);
 };
-//point set used to draw boundaries
-BgPointSet* boundaries_; // 用于存储边界
-BgPointSet* regionPts_;  // 用于存储所包含的像素
+
+class segParam
+{
+public:
+	msImageProcessor *iProc;
+	//定义的图像变量
+	BgImage* cbgImage_;
+	BgImage* filtImage_;
+	BgImage* segmImage_;
+	BgImage* whiteImage_;
+
+	//point set used to draw boundaries
+	BgPointSet* boundaries_; // 用于存储边界
+	BgPointSet* regionPts_;  // 用于存储所包含的像素
+
+	RegionList *regionList; // 存储边界信息
+	int *regionLables; // 存储多边形标识,即每个像素对应哪个多边形
+	int *regionPC; // 存储多边形中所包含的像素的个数 
+	float *regionData; // 存储每个多边形的特性
+	int regionCount; // 多边形的个数
+
+	//定义相关变量
+	BOOL *isCS;//分割区域是否为云雪区域
+
+	//segmemtation parameters
+	int		sigmaS, minRegion, kernelSize;
+	float	sigmaR, aij, epsilon, *gradMap_, *confMap_, *weightMap_, *customMap_;
+	bool		edgeParamsHaveChanged_, hasBoundaries_, buseWeightMap_;
+	SpeedUpLevel	speedUpLevel_;
+	float speedUpThreshold_;
+	int hasImage_, hasFilter_, hasSegment_;
+
+	int operation;//判断操作方式
+public:
+	segParam()
+	{
+		iProc = NULL;
+		cbgImage_ = NULL;
+		filtImage_ = NULL;
+		segmImage_ = NULL; 
+		whiteImage_ = NULL;
+		boundaries_ = NULL; 
+		regionPts_ = NULL;
+		regionList = NULL;
+		regionLables = NULL;
+		regionPC = NULL;
+		regionData = NULL;
+		isCS = NULL;
+		gradMap_ = confMap_ = weightMap_ = customMap_ = NULL;
+	};
+};
+
 
 /*****************************   特征计算   **********************************/
 /*****************************************************************************/

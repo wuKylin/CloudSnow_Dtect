@@ -1573,26 +1573,30 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 	if (threadlabel == 0)
 	{
 		beg = All_imgfile.begin();
-		endd = All_imgfile.begin() + (All_imgfile.end() - All_imgfile.begin())/2;
+		endd = All_imgfile.begin() + (All_imgfile.end() - All_imgfile.begin())/3;
 	}
 	else if (threadlabel == 1)
 	{
-		beg = All_imgfile.begin() + (All_imgfile.end() - All_imgfile.begin()) / 2;
+		beg = All_imgfile.begin() + (All_imgfile.end() - All_imgfile.begin()) / 3;
+		endd = All_imgfile.begin() + 2 * (All_imgfile.end() - All_imgfile.begin()) / 3;
+	}
+	else if (threadlabel == 2)
+	{
+		beg = All_imgfile.begin() + 2 * (All_imgfile.end() - All_imgfile.begin()) / 3;
 		endd = All_imgfile.end();
 	}
 	for (vector<string>::iterator itr = beg; itr != endd; itr++)
 	{
-	
 
 		string Src_img;
 		Src_img = Src_dir + "\\" + *itr;
-
-		
-
+	
 		if (threadlabel == 0)
 			cout << "thread01" << endl;
 		else if (threadlabel == 1)
 			cout << "thread02" << endl;
+		else if (threadlabel == 2)
+			cout << "thread03" << endl;
 
 		/*load data*/
 		int nband;
@@ -1786,10 +1790,10 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 		file.close();*/
 
 		/***                      SVM predict                     ***/
-		string regionP_dir(Src_img.substr(0, Src_img.length() - 5));
+		/*string regionP_dir(Src_img.substr(0, Src_img.length() - 5));
 		regionP_dir += "_regionP.txt";
 		ofstream file;
-		file.open(regionP_dir);
+		file.open(regionP_dir);*/
 		int length;
 		length = VecCT.size();
 		float *VClassCT = new float[length];		float *VScoreCT = new float[length];
@@ -1811,16 +1815,16 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 			ClassScore.at<float>(i, (int)VClassCT[i]) += fabs(VScoreCT[i]); ClassScore.at<float>(i, (int)VClassCL[i]) += fabs(VScoreCL[i]);
 			ClassScore.at<float>(i, (int)VClassCS[i]) += fabs(VScoreCS[i]); ClassScore.at<float>(i, (int)VClassTL[i]) += fabs(VScoreTL[i]);
 			ClassScore.at<float>(i, (int)VClassTS[i]) += fabs(VScoreTS[i]); ClassScore.at<float>(i, (int)VClassLS[i]) += 0.5*fabs(VScoreLS[i]);
-			file << VClassCT[i] << " " << VScoreCT[i] << " " << VClassCL[i] << " " << VScoreCL[i] << " ";
+			/*file << VClassCT[i] << " " << VScoreCT[i] << " " << VClassCL[i] << " " << VScoreCL[i] << " ";
 			file << VClassCS[i] << " " << VScoreCS[i] << " " << VClassTL[i] << " " << VScoreTL[i] << " ";
 			file << VClassTS[i] << " " << VScoreTS[i] << " " << VClassLS[i] << " " << VScoreLS[i] << " ";
 			file << ClassScore.at<float>(i, 1) << " " << ClassScore.at<float>(i, 2) << " "
-				<< ClassScore.at<float>(i, 3) << " " << ClassScore.at<float>(i, 4) << endl;
+				<< ClassScore.at<float>(i, 3) << " " << ClassScore.at<float>(i, 4) << endl;*/
 		}
 		vector<Mat>(VecCT).swap(VecCT); vector<Mat>(VecCT).swap(VecCL);
 		vector<Mat>(VecCT).swap(VecCS); vector<Mat>(VecCT).swap(VecTL);
 		vector<Mat>(VecCT).swap(VecTS); vector<Mat>(VecCT).swap(VecLS);
-		file.close();
+	/*	file.close();*/
 
 		Mat cloud_mask(height, width, CV_8UC1, Scalar(GC_BGD));
 		Mat snow_mask(height, width, CV_8UC1, Scalar(GC_BGD));
@@ -1972,7 +1976,10 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 				count++;
 			}
 		}
-		delete  cbgImage_, filtImage_, whiteImage_, segmImage_, boundaries_, regionPts_,regionList,regionLables;
+		delete  cbgImage_, filtImage_, whiteImage_, segmImage_,regionList;
+		delete[] regionLables;
+		delete[] regionData;
+		delete[] regionPC;
 		delete[] isCS;
 		mu.unlock();
 
@@ -2168,8 +2175,10 @@ int main()
 	double t1 = GetTickCount();
 	thread t01(CloudSnow_Dtec, All_imgfile, 0);
 	thread t02(CloudSnow_Dtec, All_imgfile, 1);
+	thread t03(CloudSnow_Dtec, All_imgfile, 2);
 	t01.join();
 	t02.join();
+	t03.join();
 
 	PrecisionTxt.open(PrecisionTxtDir, ofstream::app);
 	PrecisionTxt << "Overall precision:" << endl;
@@ -2178,7 +2187,6 @@ int main()
 	PrecisionTxt << "time cost£º" <<(double)(GetTickCount() - t1) / 1000 << " seconds" << endl;
 	PrecisionTxt.close();
 
-	
 	return 0;
 }
 

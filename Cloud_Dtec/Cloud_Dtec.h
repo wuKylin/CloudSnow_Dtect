@@ -40,8 +40,6 @@ BgImage* filtImage_;
 BgImage* segmImage_;
 BgImage* whiteImage_;
 
-
-
 //定义相关变量
 msImageProcessor *iProc;
 RegionList *regionList; // 存储边界信息

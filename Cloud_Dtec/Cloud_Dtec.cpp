@@ -257,9 +257,7 @@ void imageseg(segParam *segP)
 			segP->gradMap_ = new float[width*height];
 
 			//compute gradient and confidence maps
-			mu.lock();
 			BgEdgeDetect	edgeDetector(segP->kernelSize);
-			mu.unlock();
 			/*************************************************************/
 			cerr << " 根据原始影像计算置信图和梯度图..." << endl;
 			//pFrame->UpdateInfo(strInfo);
@@ -1726,7 +1724,9 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 		{
 			ReadImgData(img_src, segP);
 			segP->operation = 3;
+			mu.lock();
 			imageseg(segP);
+			mu.unlock();
 		}
 		else
 		{
@@ -1775,10 +1775,10 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 		file.close();*/
 
 		/***                      SVM predict                     ***/
-		string regionP_dir(Src_img.substr(0, Src_img.length() - 5));
-		regionP_dir += "_regionP.txt";
-		ofstream file;
-		file.open(regionP_dir);
+		//string regionP_dir(Src_img.substr(0, Src_img.length() - 5));
+		//regionP_dir += "_regionP.txt";
+		//ofstream file;
+		//file.open(regionP_dir);
 		int length;
 		length = VecCT.size();
 		float *VClassCT = new float[length];		float *VScoreCT = new float[length];
@@ -1788,6 +1788,7 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 		float *VClassTS = new float[length];		float *VScoreTS = new float[length];
 		float *VClassLS = new float[length];		float *VScoreLS = new float[length];
 		Mat ClassScore(length, 5, CV_32F, Scalar(0));
+		mu.lock();
 		for (int i = 0; i<length; i++)
 		{
 			VClassCT[i] = ctSVM.predict(VecCT[i], false); VScoreCT[i] = ctSVM.predict(VecCT[i], true);
@@ -1800,16 +1801,17 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 			ClassScore.at<float>(i, (int)VClassCT[i]) += fabs(VScoreCT[i]); ClassScore.at<float>(i, (int)VClassCL[i]) += fabs(VScoreCL[i]);
 			ClassScore.at<float>(i, (int)VClassCS[i]) += fabs(VScoreCS[i]); ClassScore.at<float>(i, (int)VClassTL[i]) += fabs(VScoreTL[i]);
 			ClassScore.at<float>(i, (int)VClassTS[i]) += fabs(VScoreTS[i]); ClassScore.at<float>(i, (int)VClassLS[i]) += 0.5*fabs(VScoreLS[i]);
-			file << VClassCT[i] << " " << VScoreCT[i] << " " << VClassCL[i] << " " << VScoreCL[i] << " ";
+		/*	file << VClassCT[i] << " " << VScoreCT[i] << " " << VClassCL[i] << " " << VScoreCL[i] << " ";
 			file << VClassCS[i] << " " << VScoreCS[i] << " " << VClassTL[i] << " " << VScoreTL[i] << " ";
 			file << VClassTS[i] << " " << VScoreTS[i] << " " << VClassLS[i] << " " << VScoreLS[i] << " ";
 			file << ClassScore.at<float>(i, 1) << " " << ClassScore.at<float>(i, 2) << " "
-				<< ClassScore.at<float>(i, 3) << " " << ClassScore.at<float>(i, 4) << endl;
+				<< ClassScore.at<float>(i, 3) << " " << ClassScore.at<float>(i, 4) << endl;*/
 		}
+		mu.unlock();
 		vector<Mat>(VecCT).swap(VecCT); vector<Mat>(VecCT).swap(VecCL);
 		vector<Mat>(VecCT).swap(VecCS); vector<Mat>(VecCT).swap(VecTL);
 		vector<Mat>(VecCT).swap(VecTS); vector<Mat>(VecCT).swap(VecLS);
-		file.close();
+		//file.close();
 
 		Mat cloud_mask(height, width, CV_8UC1, Scalar(GC_BGD));
 		Mat snow_mask(height, width, CV_8UC1, Scalar(GC_BGD));
@@ -1961,8 +1963,19 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 				count++;
 			}
 		}
-		delete  segP->cbgImage_, segP->filtImage_, segP->whiteImage_, segP->segmImage_, segP->boundaries_, segP->regionPts_, segP->regionList, segP->regionLables;
-		delete[] segP->isCS;
+		//delete  segP->cbgImage_, segP->filtImage_, segP->whiteImage_, segP->segmImage_, segP->regionList;
+		//segP->boundaries_->CleanData();
+		//segP->regionPts_->CleanData();
+		//delete segP->boundaries_, segP->regionPts_;
+		//delete[] segP->regionLables;
+		//delete[] segP->regionPC;
+		//delete[] segP->regionData;
+		//delete[] segP->confMap_;
+		//delete[] segP->customMap_;
+		//delete[] segP->gradMap_;
+		//delete[] segP->weightMap_;
+		//delete[] segP->isCS;
+		delete segP;
 
 		string ResultImgDir, ResultTxtDir, SrcImgDir;
 		ResultImgDir = Src_img.substr(0, Src_img.length() - 5) + "_ClassU.bmp";
@@ -2136,7 +2149,7 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 		delete[] IsInterestArea;
 		delete[] HOT;
 		delete[] SF;
-		
+
 		GDALClose(poDataset);	
 	}
 }

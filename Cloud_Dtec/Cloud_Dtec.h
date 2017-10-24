@@ -54,7 +54,7 @@ public:
 		x_ = NULL;
 		y_ = NULL;
 	};
-	~BgPointSet();
+//	~BgPointSet();
 	void CleanData()
 	{
 		if (x_ != NULL)	{ delete[]x_; }
@@ -112,6 +112,21 @@ public:
 		isCS = NULL;
 		gradMap_ = confMap_ = weightMap_ = customMap_ = NULL;
 	};
+	~segParam()
+	{
+		delete  cbgImage_, filtImage_, whiteImage_, segmImage_, regionList,iProc;
+		boundaries_->CleanData();
+		regionPts_->CleanData();
+		delete boundaries_, regionPts_;
+		delete[] regionLables;
+		delete[] regionPC;
+		delete[] regionData;
+		delete[] confMap_;
+		delete[] customMap_;
+		delete[] gradMap_;
+		delete[] weightMap_;
+		delete[] isCS;
+	}
 };
 
 

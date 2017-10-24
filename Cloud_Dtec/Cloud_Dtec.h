@@ -32,7 +32,8 @@ using namespace::std;
 
 #define thres_p_CS 0.2
 Mat src, dst;
-int height, width;
+int height = 500; 
+int width = 500;
 
 CvSVMParams ctparams, clparams, csparams, tlparams, tsparams, lsparams;
 CvSVM ctSVM,clSVM,csSVM,tlSVM,tsSVM,lsSVM;
@@ -1065,7 +1066,7 @@ void calEdgeCurHis(int **m_gray, int height, int width,float *CurHistogram)
 		}
 	}
 	for (int i = 0; i < 10; i++){ CurHistogram[i] = 0.0; }
-	for (int i = 0; i < BPoint.size(); i++)
+	for (size_t i = 0; i < BPoint.size(); i++)
 	{
 		xPos = (BPoint[i] / width) + 2;
 		yPos = (BPoint[i] % width) + 2;

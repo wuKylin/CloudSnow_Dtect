@@ -35,13 +35,13 @@ int GetTiffFile(const string& directory, vector<string>* entries)
 
 } 
 
-void ReadImgData(byte *img_src,segParam &segP)
+void ReadImgData(byte *img_src,segParam *segP)
 {
-	segP.hasBoundaries_ = false;
-	if (segP.hasBoundaries_)
+	segP->hasBoundaries_ = false;
+	if (segP->hasBoundaries_)
 	{
-		segP.hasBoundaries_ = false;
-		segP.boundaries_->CleanData();
+		segP->hasBoundaries_ = false;
+		segP->boundaries_->CleanData();
 	}
 	if (img_src != NULL == NULL)
 		return;
@@ -60,31 +60,31 @@ void ReadImgData(byte *img_src,segParam &segP)
 	}
 
 	/*                                 */
-	segP.cbgImage_ = new BgImage();
-	segP.whiteImage_ = new BgImage();
-	segP.filtImage_ = new BgImage();
-	segP.segmImage_ = new BgImage();
-	segP.boundaries_ = new BgPointSet();
-	segP.regionPts_ = new BgPointSet();
+	segP->cbgImage_ = new BgImage();
+	segP->whiteImage_ = new BgImage();
+	segP->filtImage_ = new BgImage();
+	segP->segmImage_ = new BgImage();
+	segP->boundaries_ = new BgPointSet();
+	segP->regionPts_ = new BgPointSet();
 
-	if (segP.iProc)
+	if (segP->iProc)
 	{
-		delete segP.iProc;
-		segP.iProc = NULL;
+		delete segP->iProc;
+		segP->iProc = NULL;
 	}
-	segP.iProc = new msImageProcessor;
+	segP->iProc = new msImageProcessor;
 	//	sigmaS		= 7;
-	segP.sigmaS = 7;
+	segP->sigmaS = 7;
 	//	sigmaR		= float(5.5);
-	segP.sigmaR = float(5.5);
-	segP.aij = float(0.8);
-	segP.epsilon = float(0.6);
+	segP->sigmaR = float(5.5);
+	segP->aij = float(0.8);
+	segP->epsilon = float(0.6);
 	//	minRegion	= 1000;
 	//	minRegion	= 400;
-	segP.minRegion = 300;
-	segP.kernelSize = 2;
+	segP->minRegion = 300;
+	segP->kernelSize = 2;
 
-	segP.cbgImage_->SetImageFromRGB(tpImg, width_, height_, true);
+	segP->cbgImage_->SetImageFromRGB(tpImg, width_, height_, true);
 
 	//set cbgImage
 	if (tpImg)
@@ -102,44 +102,44 @@ void ReadImgData(byte *img_src,segParam &segP)
 	whiteImage_ hasBoundaries_ ;  // 是否显示分割的轮廓 contour image
 	*/
 	/************************************************************************/
-	segP.hasImage_ = 1;
-	segP.hasFilter_ = 0;
-	segP.hasSegment_ = 0;
-	segP.hasBoundaries_ = 0;
+	segP->hasImage_ = 1;
+	segP->hasFilter_ = 0;
+	segP->hasSegment_ = 0;
+	segP->hasBoundaries_ = 0;
 
 	//set white image
 	unsigned char *img = new unsigned char[(width_)*(height_)* 3];
 	memset(img, 255, (width_)*(height_)* 3);
-	segP.whiteImage_->SetImageFromRGB(img, width_, height_, true);
+	segP->whiteImage_->SetImageFromRGB(img, width_, height_, true);
 	delete[] img;
 
 	//delete edge maps if they exists...
-	//if (segP.customMap_)	delete[] segP.customMap_;
-	//if (segP.gradMap_)	delete[] segP.gradMap_;
-	//if (segP.confMap_)	delete[] segP.confMap_;
-	//if (segP.weightMap_)	delete[] segP.weightMap_;
+	if (segP->customMap_)	delete[] segP->customMap_;
+	if (segP->gradMap_)	delete[] segP->gradMap_;
+	if (segP->confMap_)	delete[] segP->confMap_;
+	if (segP->weightMap_)	delete[] segP->weightMap_;
 
 	//set edge maps to NULL...
-	segP.customMap_ = (float *)NULL;
-	segP.gradMap_ = (float *)NULL;
-	segP.confMap_ = (float *)NULL;
-	segP.weightMap_ = (float *)NULL;
+	segP->customMap_ = (float *)NULL;
+	segP->gradMap_ = (float *)NULL;
+	segP->confMap_ = (float *)NULL;
+	segP->weightMap_ = (float *)NULL;
 
-	segP.hasImage_ = 1;
+	segP->hasImage_ = 1;
 }
 
-void GetBoundariesPtIdx(segParam &segP)
+void GetBoundariesPtIdx(segParam *segP)
 {
 	// 进行分割后
-	if (segP.hasSegment_)
+	if (segP->hasSegment_)
 	{
 		//clean boundary data if any exists
-		segP.boundaries_->CleanData();
+		segP->boundaries_->CleanData();
 		int	width, height;
-		width = segP.cbgImage_->x_; // 原始影像的宽度
-		height = segP.cbgImage_->y_; // 原始影像的高度
-		int			*boundaryIndeces = segP.regionList->GetBoundaryIndeces(0); // 获取多边形的指数
-		int			numRegions = segP.regionList->GetNumRegions();  // 多边形的个数
+		width = segP->cbgImage_->x_; // 原始影像的宽度
+		height = segP->cbgImage_->y_; // 原始影像的高度
+		int			*boundaryIndeces = segP->regionList->GetBoundaryIndeces(0); // 获取多边形的指数
+		int			numRegions = segP->regionList->GetNumRegions();  // 多边形的个数
 		int			boundaryPointCount = 0; // 边界的点数
 
 		//calculate the number of boundary points stored by region list
@@ -149,50 +149,50 @@ void GetBoundariesPtIdx(segParam &segP)
 		// 计算边界的点数，通过多边形表来存储
 		for (i = 0; i < numRegions; i++)
 		{
-			boundaryPointCount += segP.regionList->GetBourdaryCount(i); // 获取每个多边形的边界数，将边界的点数进行累加
+			boundaryPointCount += segP->regionList->GetBourdaryCount(i); // 获取每个多边形的边界数，将边界的点数进行累加
 		}
 
 		//create a point set using calculated boundary point count...
-		segP.boundaries_->x_ = new int[boundaryPointCount]; // 边界的x序号
-		segP.boundaries_->y_ = new int[boundaryPointCount]; // 边界的y序号
-		segP.boundaries_->n_ = boundaryPointCount;  // 边界的点数
+		segP->boundaries_->x_ = new int[boundaryPointCount]; // 边界的x序号
+		segP->boundaries_->y_ = new int[boundaryPointCount]; // 边界的y序号
+		segP->boundaries_->n_ = boundaryPointCount;  // 边界的点数
 
 
 
 		for (i = 0; i < boundaryPointCount; i++)
 		{
-			segP.boundaries_->x_[i] = boundaryIndeces[i] % width; // 列数
-			segP.boundaries_->y_[i] = boundaryIndeces[i] / width; // 行数
+			segP->boundaries_->x_[i] = boundaryIndeces[i] % width; // 列数
+			segP->boundaries_->y_[i] = boundaryIndeces[i] / width; // 行数
 		}
 
 
 
 
 		//set point type to point (= 1)
-		segP.boundaries_->type_ = 1;
+		segP->boundaries_->type_ = 1;
 		//set has boundaries to true
-		segP.hasBoundaries_ = true;
+		segP->hasBoundaries_ = true;
 	}
 	else
 	{
-		segP.hasBoundaries_ = false;
+		segP->hasBoundaries_ = false;
 		cerr << "没有打开影像，或没有进行分割！" << endl;
 	}
 }
 
-void GetRegionsPtIdx(segParam &segP)			// 获取所有区域所包含的像素
+void GetRegionsPtIdx(segParam *segP)			// 获取所有区域所包含的像素
 {
-	if (segP.hasFilter_)
+	if (segP->hasFilter_)
 	{
 		//clean boundary data if any exists
-		segP.regionPts_->CleanData();  // 清除数据
+		segP->regionPts_->CleanData();  // 清除数据
 		int	width, height;
-		width = segP.cbgImage_->x_; // 原始影像的宽度
-		height = segP.cbgImage_->y_; // 原始影像的高度
+		width = segP->cbgImage_->x_; // 原始影像的宽度
+		height = segP->cbgImage_->y_; // 原始影像的高度
 
 		// 问题的关键出在regionIndeces上
-		int			*regionIndeces = segP.regionList->GetRegionPtIndeces(0); // 获取多边形的指数
-		int			numRegions = segP.regionList->GetNumRegions();  // 多边形的个数
+		int			*regionIndeces = segP->regionList->GetRegionPtIndeces(0); // 获取多边形的指数
+		int			numRegions = segP->regionList->GetNumRegions();  // 多边形的个数
 		int			regionPointCount = 0; // 所有区域内包含的总点数，其实就是整幅影像的总点数
 
 		//calculate the number of region points stored by region list
@@ -202,74 +202,74 @@ void GetRegionsPtIdx(segParam &segP)			// 获取所有区域所包含的像素
 		regionPointCount = width*height;
 
 		//create a point set using calculated boundary point count...
-		segP.regionPts_->x_ = new int[regionPointCount]; // 点的x序号
-		segP.regionPts_->y_ = new int[regionPointCount]; // 点的y序号
+		segP->regionPts_->x_ = new int[regionPointCount]; // 点的x序号
+		segP->regionPts_->y_ = new int[regionPointCount]; // 点的y序号
 
-		segP.regionPts_->n_ = regionPointCount;  // 点数
+		segP->regionPts_->n_ = regionPointCount;  // 点数
 
 		for (i = 0; i < regionPointCount; i++)
 		{
-			segP.regionPts_->x_[i] = regionIndeces[i] % width; // 列数
-			segP.regionPts_->y_[i] = regionIndeces[i] / width; // 行数
+			segP->regionPts_->x_[i] = regionIndeces[i] % width; // 列数
+			segP->regionPts_->y_[i] = regionIndeces[i] / width; // 行数
 		}
 
-		segP.regionPts_->type_ = 1;
+		segP->regionPts_->type_ = 1;
 	}
 }
 
-void imageseg(segParam &segP)
+void imageseg(segParam *segP)
 {
-	if (segP.hasImage_ == 0)	{ return; }   //hasImage_为0表示没有正确的完成ReadImgData()
+	if (segP->hasImage_ == 0)	{ return; }   //hasImage_为0表示没有正确的完成ReadImgData()
 	//obtain image dimensions
 	int	width, height;
-	width = segP.cbgImage_->x_; // 原始影像的宽度
-	height = segP.cbgImage_->y_; // 原始影像的高度
+	width = segP->cbgImage_->x_; // 原始影像的宽度
+	height = segP->cbgImage_->y_; // 原始影像的高度
 
 	//obtain image type (color or grayscale)
 	imageType 	gtype;
-	if (segP.cbgImage_->colorIm_)
+	if (segP->cbgImage_->colorIm_)
 		gtype = COLOR;
 	else
 		gtype = GRAYSCALE;
 
-	segP.buseWeightMap_ = true;
-	if (segP.buseWeightMap_)
+	segP->buseWeightMap_ = true;
+	if (segP->buseWeightMap_)
 	{
 		//if the weight map has already been defined
 		//then find out if it needs to be recomputed
-		segP.edgeParamsHaveChanged_ = false;
+		segP->edgeParamsHaveChanged_ = false;
 		// 如果参数改变且权重图已经计算，则要重置权重图，根据置信图与梯度图，进行计算权重图
-		if ((segP.weightMap_) && (segP.edgeParamsHaveChanged_))
+		if ((segP->weightMap_) && (segP->edgeParamsHaveChanged_))
 		{
-			delete[] segP.confMap_; // 置信度图
-			delete[] segP.gradMap_; // 梯度图
-			delete[] segP.weightMap_; // 权重图
-			segP.weightMap_ = (float *)NULL;
+			delete[] segP->confMap_; // 置信度图
+			delete[] segP->gradMap_; // 梯度图
+			delete[] segP->weightMap_; // 权重图
+			segP->weightMap_ = (float *)NULL;
 			//indicate that the change has been recognized...
-			segP.edgeParamsHaveChanged_ = false;
+			segP->edgeParamsHaveChanged_ = false;
 		}
 		//if the weight map has not been computed or discarded
 		//then recompute it...
-		if (!segP.weightMap_) // 当权重图重置或权重图为空时，对权重图进行计算
+		if (!segP->weightMap_) // 当权重图重置或权重图为空时，对权重图进行计算
 		{
 			//allocate memory for gradient and confidence maps
-			segP.confMap_ = new float[width*height];
-			segP.gradMap_ = new float[width*height];
+			segP->confMap_ = new float[width*height];
+			segP->gradMap_ = new float[width*height];
 
 			//compute gradient and confidence maps
 			mu.lock();
-			BgEdgeDetect	edgeDetector(segP.kernelSize);
+			BgEdgeDetect	edgeDetector(segP->kernelSize);
 			mu.unlock();
 			/*************************************************************/
 			cerr << " 根据原始影像计算置信图和梯度图..." << endl;
 			//pFrame->UpdateInfo(strInfo);
 			/*************************************************************/
-			edgeDetector.ComputeEdgeInfo(segP.cbgImage_, segP.confMap_, segP.gradMap_);  // 根据原始影像计算置信图，梯度图（边缘检测来进行计算）
+			edgeDetector.ComputeEdgeInfo(segP->cbgImage_, segP->confMap_, segP->gradMap_);  // 根据原始影像计算置信图，梯度图（边缘检测来进行计算）
 
 			//compute weight map...
 
 			//allocate memory for weight map
-			segP.weightMap_ = new float[width*height];
+			segP->weightMap_ = new float[width*height];
 			/*************************************************************/
 			cerr << " 根据置信图和梯度图计算权重图..." << endl;
 			//pFrame->UpdateInfo(strInfo);
@@ -278,10 +278,10 @@ void imageseg(segParam &segP)
 			int i;
 			for (i = 0; i<width*height; i++)
 			{
-				if (segP.gradMap_[i] > 0.02)
-					segP.weightMap_[i] = segP.aij*segP.gradMap_[i] + (1 - segP.aij)*segP.confMap_[i]; //
+				if (segP->gradMap_[i] > 0.02)
+					segP->weightMap_[i] = segP->aij*segP->gradMap_[i] + (1 - segP->aij)*segP->confMap_[i]; //
 				else
-					segP.weightMap_[i] = 0; // 如果梯度过小，则权重赋予0
+					segP->weightMap_[i] = 0; // 如果梯度过小，则权重赋予0
 			}
 		}
 	}
@@ -301,39 +301,39 @@ void imageseg(segParam &segP)
 	//define an input image using the image under consideration
 	//(if filtering or segmentation has taken place, then use this
 	// result upon performing fusing...)
-	segP.hasFilter_ = false;
-	if ((segP.operation == 2) && (segP.hasFilter_))
-		segP.iProc->DefineImage(segP.filtImage_->im_, gtype, height, width); // 如果已经滤波以及融合，则对设置对平滑的图像进行处理
+	segP->hasFilter_ = false;
+	if ((segP->operation == 2) && (segP->hasFilter_))
+		segP->iProc->DefineImage(segP->filtImage_->im_, gtype, height, width); // 如果已经滤波以及融合，则对设置对平滑的图像进行处理
 	else
-		segP.iProc->DefineImage(segP.cbgImage_->im_, gtype, height, width); // 如果是没有进行平滑处理，就对原始图像进行处理
+		segP->iProc->DefineImage(segP->cbgImage_->im_, gtype, height, width); // 如果是没有进行平滑处理，就对原始图像进行处理
 
 	bool useCustomMap = false;
 	//set the weight map (if one was specified and a custom map is not being utilized)
-	if ((segP.buseWeightMap_) && (segP.weightMap_) && (!useCustomMap))	segP.iProc->SetWeightMap(segP.weightMap_, segP.epsilon);
+	if ((segP->buseWeightMap_) && (segP->weightMap_) && (!useCustomMap))	segP->iProc->SetWeightMap(segP->weightMap_, segP->epsilon);
 
 	//set the custom map (if one was provided)
-	if ((segP.buseWeightMap_) && (segP.customMap_) && (useCustomMap))	segP.iProc->SetWeightMap(segP.customMap_, segP.epsilon);
+	if ((segP->buseWeightMap_) && (segP->customMap_) && (useCustomMap))	segP->iProc->SetWeightMap(segP->customMap_, segP->epsilon);
 
 	// 进行图像的分割和图像的平滑
 	//perform image segmentation or filtering....
-	segP.iProc->SetSpeedThreshold(segP.speedUpThreshold_);
-	segP.speedUpLevel_ = MED_SPEEDUP;
+	segP->iProc->SetSpeedThreshold(segP->speedUpThreshold_);
+	segP->speedUpLevel_ = MED_SPEEDUP;
 
 	//filter the image...
 	/*************************************************************/
 	cerr << " 正在平滑影像...\r\n" << endl;
 	//pFrame->UpdateInfo(strInfo);
 	/*************************************************************/
-	segP.iProc->Filter(segP.sigmaS, segP.sigmaR, segP.speedUpLevel_);
+	segP->iProc->Filter(segP->sigmaS, segP->sigmaR, segP->speedUpLevel_);
 
 	//filter the image....
 	int dim;
-	if (segP.cbgImage_->colorIm_)
+	if (segP->cbgImage_->colorIm_)
 		dim = 3;
 	else
 		dim = 1;
 	unsigned char *tempImage = new unsigned char[dim*height*width];
-	segP.iProc->GetResults(tempImage);
+	segP->iProc->GetResults(tempImage);
 
 	//fuse regions...
 	/*************************************************************/
@@ -341,29 +341,29 @@ void imageseg(segParam &segP)
 	//pFrame->UpdateInfo(strInfo);
 	/*************************************************************/
 	// 区域生长，合并，修剪，FuseRegions就是比segment少了一个filter，分割可以看作先filter后fuseRegions
-	segP.iProc->FuseRegions(segP.sigmaR, segP.minRegion);
+	segP->iProc->FuseRegions(segP->sigmaR, segP->minRegion);
 
 
 	//obtain the segmented and filtered image...
-	segP.filtImage_->Resize(width, height, segP.cbgImage_->colorIm_);  // 
-	memcpy(segP.filtImage_->im_, tempImage, dim*height*width*sizeof(unsigned char));
+	segP->filtImage_->Resize(width, height, segP->cbgImage_->colorIm_);  // 
+	memcpy(segP->filtImage_->im_, tempImage, dim*height*width*sizeof(unsigned char));
 	delete[] tempImage;
-	segP.segmImage_->Resize(width, height, segP.cbgImage_->colorIm_);
-	segP.iProc->GetResults(segP.segmImage_->im_); // 存储分割数据
+	segP->segmImage_->Resize(width, height, segP->cbgImage_->colorIm_);
+	segP->iProc->GetResults(segP->segmImage_->im_); // 存储分割数据
 
 	//indicate that the segmented image has been computed...
-	segP.hasFilter_ = 1;
-	segP.hasSegment_ = 1;
+	segP->hasFilter_ = 1;
+	segP->hasSegment_ = 1;
 
 	//**************************************这段代码需要判断是否为NULL*********************************************
 	/************************************************************************/
 	/*  defineboudaries modepointcounts                                                                    */
 	/************************************************************************/
-	segP.regionList = segP.iProc->GetBoundariesAndRegions(); // 获取边界 ,
-	segP.regionLables = segP.iProc->GetLabels(); // 获取多边形的标识
-	segP.regionPC = segP.iProc->GetMPC(); // 获取多边形的所包含的像素个数
-	segP.regionData = segP.iProc->GetModeData(); // 获取每个多边形的数据
-	segP.regionCount = segP.regionList->GetNumRegions();
+	segP->regionList = segP->iProc->GetBoundariesAndRegions(); // 获取边界 ,
+	segP->regionLables = segP->iProc->GetLabels(); // 获取多边形的标识
+	segP->regionPC = segP->iProc->GetMPC(); // 获取多边形的所包含的像素个数
+	segP->regionData = segP->iProc->GetModeData(); // 获取每个多边形的数据
+	segP->regionCount = segP->regionList->GetNumRegions();
 	//**************************************这段代码需要判断是否为NULL*********************************************
 
 	// 获取边界，boundaries_存储边界点坐标。
@@ -373,7 +373,7 @@ void imageseg(segParam &segP)
 
 	/**************************分割已经完成!*******************************/
 
-	cout << " 影像被分为" << segP.regionCount << "块" << endl;
+	cout << " 影像被分为" << segP->regionCount << "块" << endl;
 }
 
 void TF_TOAto255(float *TOA,byte *DN,int height,int width,int nband) 
@@ -452,13 +452,13 @@ int Calcu_Ostu(double **m_gray_Arr, int m_height, int m_width)
 	return nThresh;
 }
 
-void savetiffsample(BYTE*SrcImgData1, string sample_dir, int regionNum, Mat boudryMat, BOOL **IsInterestArea, byte *img_src, segParam &segP)
+void savetiffsample(BYTE*SrcImgData1, string sample_dir, int regionNum, Mat boudryMat, BOOL **IsInterestArea, byte *img_src, segParam *segP)
 {
 	int j;
 	int count = 0;
 	for (int i = 0; i < regionNum; i++)
 	{
-		segP.isCS[i] = false;
+		segP->isCS[i] = false;
 		int num_CS = 0;
 		double p_CS;
 		int x_max = -1, x_min = width + 1, y_max = -1, y_min = height + 1;
@@ -468,9 +468,9 @@ void savetiffsample(BYTE*SrcImgData1, string sample_dir, int regionNum, Mat boud
 	
 		mkdir(sample_dir.c_str());
 
-		int *regionindex = segP.regionList->GetRegionPtIndeces(i);
+		int *regionindex = segP->regionList->GetRegionPtIndeces(i);
 		int pos, x_t, y_t;
-		for (j = 0; j < segP.regionPC[i]; j++)//regionPC[i]每个多边形包含点个数
+		for (j = 0; j < segP->regionPC[i]; j++)//regionPC[i]每个多边形包含点个数
 		{
 			pos = *(regionindex + j);
 			x_t = pos % width;//列数
@@ -484,14 +484,14 @@ void savetiffsample(BYTE*SrcImgData1, string sample_dir, int regionNum, Mat boud
 				num_CS++;
 			}
 		}
-		p_CS = (double)num_CS / segP.regionPC[i];
+		p_CS = (double)num_CS / segP->regionPC[i];
 		if (p_CS > thres_p_CS)
 		{
-			segP.isCS[i] = true;
+			segP->isCS[i] = true;
 		}
-		if (!segP.isCS[i])
+		if (!segP->isCS[i])
 		{
-			for (j = 0; j < segP.regionPC[i]; j++)//regionPC[i]每个多边形包含点个数
+			for (j = 0; j < segP->regionPC[i]; j++)//regionPC[i]每个多边形包含点个数
 			{
 				pos = *(regionindex + j);
 				x_t = pos % width;//列数
@@ -519,7 +519,7 @@ void savetiffsample(BYTE*SrcImgData1, string sample_dir, int regionNum, Mat boud
 		{
 			temp[j] = 0.0;
 		}
-		for (j = 0; j < segP.regionPC[i]; j++)
+		for (j = 0; j < segP->regionPC[i]; j++)
 		{
 			pos = *(regionindex + j);
 			x_t = pos % width;//列数
@@ -856,22 +856,22 @@ void ls_svm_train()
 	lsSVM.train(trainMat, labelMat, Mat(), Mat(), lsparams);
 }
 
-void calFeature(BYTE *SrcImgData1, vector<Mat> &VecCT, vector<Mat> &VecCL, vector<Mat> &VecCS, vector<Mat> &VecTL, vector<Mat> &VecTS, vector<Mat> &VecLS, BOOL**IsInterestArea,segParam &segP)
+void calFeature(BYTE *SrcImgData1, vector<Mat> &VecCT, vector<Mat> &VecCL, vector<Mat> &VecCS, vector<Mat> &VecTL, vector<Mat> &VecTS, vector<Mat> &VecLS, BOOL**IsInterestArea,segParam *segP)
 {
 	/*以下是对每块样本分别提取FeatureNum维向量 */
-	segP.isCS = new BOOL[segP.regionList->GetNumRegions()];
-	for (int n = 0; n < segP.regionList->GetNumRegions(); n++)
+	segP->isCS = new BOOL[segP->regionList->GetNumRegions()];
+	for (int n = 0; n < segP->regionList->GetNumRegions(); n++)
 	{
 		Mat TempMat(1, 50, CV_32FC1);
-		segP.isCS[n] = false;
+		segP->isCS[n] = false;
 		int num_CS = 0;
 		float p_CS;
 		int x_max = -1, x_min = width + 1, y_max = -1, y_min = height + 1;
 		int x_dis, y_dis;
 
-		int *regionindex = segP.regionList->GetRegionPtIndeces(n);
+		int *regionindex = segP->regionList->GetRegionPtIndeces(n);
 		int pos, x_t, y_t;
-		for (int j = 0; j < segP.regionPC[n]; j++)//regionPC[i]每个多边形包含点个数
+		for (int j = 0; j < segP->regionPC[n]; j++)//regionPC[i]每个多边形包含点个数
 		{
 			pos = *(regionindex + j);
 			x_t = pos % width;//列数
@@ -885,12 +885,12 @@ void calFeature(BYTE *SrcImgData1, vector<Mat> &VecCT, vector<Mat> &VecCL, vecto
 				num_CS++;
 			}
 		}
-		p_CS = (double)num_CS / segP.regionPC[n];
+		p_CS = (double)num_CS / segP->regionPC[n];
 		if (p_CS > thres_p_CS)
 		{
-			segP.isCS[n] = true;
+			segP->isCS[n] = true;
 		}
-		if (!segP.isCS[n])
+		if (!segP->isCS[n])
 		{
 			continue;
 		}
@@ -903,7 +903,7 @@ void calFeature(BYTE *SrcImgData1, vector<Mat> &VecCT, vector<Mat> &VecCL, vecto
 		{
 			pSmpdata[j] = 0.0;
 		}
-		for (int j = 0; j < segP.regionPC[n]; j++)//regionPC[i]每个多边形包含点个数
+		for (int j = 0; j < segP->regionPC[n]; j++)//regionPC[i]每个多边形包含点个数
 		{
 			pos = *(regionindex + j);
 			x_t = pos % width;//列数
@@ -1568,7 +1568,6 @@ int countPrecision = 0, countPrecisionCloud = 0, countPrecisionSnow = 0;
 double overall_cloud_accuracy = 0.0, overall_cloud_precision = 0.0, overall_cloud_recall = 0.0;
 double overall_snow_accuracy = 0.0, overall_snow_precision = 0.0, overall_snow_recall = 0.0;
 
-
 void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 {
 	vector<string>::iterator beg, endd;
@@ -1593,7 +1592,7 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 			cout << "thread02" << endl;
 
 		/*load data*/
-		int nband;
+		int nband=4;
 		GDALAllRegister();
 		GDALDataset *poDataset = NULL;
 		poDataset = (GDALDataset*)GDALOpen(Src_img.c_str(), GA_ReadOnly);
@@ -1603,16 +1602,8 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 			return;
 		}
 
-		mu.lock();
-		width = poDataset->GetRasterXSize();
-		height = poDataset->GetRasterYSize();
-		nband = poDataset->GetRasterCount();
-		mu.unlock();
-
 		cout << *itr << " processing:" << endl;
-		cout << "Drivers:" << poDataset->GetDriver()->GetDescription() << poDataset->GetDriver()->GetMetadataItem(GDAL_DMD_LONGNAME) << endl;
-		cout << "Size is " << poDataset->GetRasterXSize() << "," << poDataset->GetRasterYSize() << "," << poDataset->GetRasterCount() << endl;
-
+	
 		float *pImgdata;
 		pImgdata = NULL;
 		pImgdata = new float[width*height*nband];
@@ -1639,7 +1630,6 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 		}
 		calSF(pImgdata1, height, width, SF);
 		int ostuSF = Calcu_Ostu(SF, height, width);
-
 
 		/*生成HOT,SF图像*/
 		//string HOT_des, seg_des;
@@ -1723,19 +1713,19 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 			}
 		}
 
-		segParam segP;
+		segParam *segP=new segParam();
 
-		//if (segP.iProc)
-		//{
-		//	delete segP.iProc;
-		//	segP.iProc = NULL;
-		//}
-		segP.iProc = new msImageProcessor;
+		if (segP->iProc)
+		{
+			delete segP->iProc;
+			segP->iProc = NULL;
+		}
+		segP->iProc = new msImageProcessor;
 
 		if (img_src != NULL)
 		{
 			ReadImgData(img_src, segP);
-			segP.operation = 3;
+			segP->operation = 3;
 			imageseg(segP);
 		}
 		else
@@ -1826,11 +1816,11 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 		Mat ResultImg(height, width, CV_8UC3, Scalar(0));
 		int count = 0;
 
-		for (int i = 0; i < segP.regionList->GetNumRegions(); i++)
+		for (int i = 0; i < segP->regionList->GetNumRegions(); i++)
 		{
-			if (segP.isCS[i] == true)
+			if (segP->isCS[i] == true)
 			{
-				int *regionindex = segP.regionList->GetRegionPtIndeces(i);
+				int *regionindex = segP->regionList->GetRegionPtIndeces(i);
 				int pos, x_t, y_t, ClassMax = 1;
 
 				for (int j = 2; j < 5; j++)
@@ -1843,7 +1833,7 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 
 				if (ClassMax == 1)
 				{
-					for (int j = 0; j < segP.regionPC[i]; j++)//regionPC[i]每个多边形包含点个数
+					for (int j = 0; j < segP->regionPC[i]; j++)//regionPC[i]每个多边形包含点个数
 					{
 						pos = *(regionindex + j);
 						x_t = pos % width;//列数
@@ -1865,7 +1855,7 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 				}
 				else if (ClassMax == 2)
 				{
-					for (int j = 0; j < segP.regionPC[i]; j++)//regionPC[i]每个多边形包含点个数
+					for (int j = 0; j < segP->regionPC[i]; j++)//regionPC[i]每个多边形包含点个数
 					{
 						pos = *(regionindex + j);
 						x_t = pos % width;//列数
@@ -1886,7 +1876,7 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 				}
 				else if (ClassMax == 3)
 				{
-					for (int j = 0; j < segP.regionPC[i]; j++)//regionPC[i]每个多边形包含点个数
+					for (int j = 0; j < segP->regionPC[i]; j++)//regionPC[i]每个多边形包含点个数
 					{
 						pos = *(regionindex + j);
 						x_t = pos % width;//列数
@@ -1907,7 +1897,7 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 				}
 				else if (ClassMax == 4)
 				{
-					for (int j = 0; j < segP.regionPC[i]; j++)//regionPC[i]每个多边形包含点个数
+					for (int j = 0; j < segP->regionPC[i]; j++)//regionPC[i]每个多边形包含点个数
 					{
 						pos = *(regionindex + j);
 						x_t = pos % width;//列数
@@ -1928,9 +1918,9 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 				}
 			}
 			else{
-				int *regionindex = segP.regionList->GetRegionPtIndeces(i);
+				int *regionindex = segP->regionList->GetRegionPtIndeces(i);
 				int pos, x_t, y_t;
-				for (int j = 0; j < segP.regionPC[i]; j++)//regionPC[i]每个多边形包含点个数
+				for (int j = 0; j < segP->regionPC[i]; j++)//regionPC[i]每个多边形包含点个数
 				{
 					pos = *(regionindex + j);
 					x_t = pos % width;//列数
@@ -1945,14 +1935,14 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 		}
 		count = 0;
 
-		for (int i = 0; i < segP.regionList->GetNumRegions(); i++)
+		for (int i = 0; i < segP->regionList->GetNumRegions(); i++)
 		{
-			if (segP.isCS[i] == true)
+			if (segP->isCS[i] == true)
 			{
 				int text_x = 0, text_y = 0;
-				int *regionindex = segP.regionList->GetRegionPtIndeces(i);
+				int *regionindex = segP->regionList->GetRegionPtIndeces(i);
 				int pos, x_t, y_t;
-				for (int j = 0; j < segP.regionPC[i]; j++)//regionPC[i]每个多边形包含点个数
+				for (int j = 0; j < segP->regionPC[i]; j++)//regionPC[i]每个多边形包含点个数
 				{
 					pos = *(regionindex + j);
 					x_t = pos % width;//列数
@@ -1960,8 +1950,8 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 					text_x += x_t;
 					text_y += y_t;
 				}
-				text_x /= segP.regionPC[i];
-				text_y /= segP.regionPC[i];
+				text_x /= segP->regionPC[i];
+				text_y /= segP->regionPC[i];
 				Scalar red = Scalar(0, 0, 255);
 				stringstream word;
 				string temp;
@@ -1971,8 +1961,8 @@ void CloudSnow_Dtec(vector<string> &All_imgfile,int threadlabel)
 				count++;
 			}
 		}
-		delete  segP.cbgImage_, segP.filtImage_, segP.whiteImage_, segP.segmImage_, segP.boundaries_, segP.regionPts_, segP.regionList, segP.regionLables;
-		delete[] segP.isCS;
+		delete  segP->cbgImage_, segP->filtImage_, segP->whiteImage_, segP->segmImage_, segP->boundaries_, segP->regionPts_, segP->regionList, segP->regionLables;
+		delete[] segP->isCS;
 
 		string ResultImgDir, ResultTxtDir, SrcImgDir;
 		ResultImgDir = Src_img.substr(0, Src_img.length() - 5) + "_ClassU.bmp";
